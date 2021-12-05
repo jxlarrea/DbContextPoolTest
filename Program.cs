@@ -44,7 +44,7 @@ AssemblyLoadContext.Default.Unloading += (AssemblyLoadContext obj) =>
 
 var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
 
-var maxRunCount = 50;
+var maxRunCount = 150;
 var runIntervalSeconds = 5;
 
 var timer = new PeriodicTimer(TimeSpan.FromSeconds(runIntervalSeconds));
