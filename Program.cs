@@ -1,4 +1,4 @@
-﻿using DbContextPoolTest;
+using DbContextPoolTest;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -22,6 +22,7 @@ var host = hostBuilder.ConfigureServices((_, services) =>
 
 }).ConfigureLogging((context, b) =>
 {
+    // Filter EfCore logs to get rid of TaskCanceledException logging that EFCore does by default.
     b.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.None);
     b.AddFilter("Microsoft.EntityFrameworkCore.Database.Connection", LogLevel.None);
     b.AddFilter("Microsoft.EntityFrameworkCore.Query", LogLevel.None); ;
@@ -53,6 +54,7 @@ var batchCount = 1;
 
 try
 {
+    // Run a batch every 5 seconds
     while (await timer.WaitForNextTickAsync(ct))
     {
         var cs2 = new CancellationTokenSource();
@@ -61,6 +63,8 @@ try
         var runCount = Random.Shared.Next(maxRunCount);
         
         Console.WriteLine($"Batch {batchCount} start. {runCount} runs.");
+        
+        // Random number of tasks in each batch.
         Task[] taskArray = new Task[runCount];
 
         for (int i = 0; i < taskArray.Length; i++)
@@ -69,6 +73,7 @@ try
             taskArray[i] = RunApp(host.Services, x, ct2);             
         }
 
+        // 50% chance to cancel the tasks in the batch
         Random rand = new Random();
 
         if (rand.Next(0, 2) != 0)
@@ -77,6 +82,7 @@ try
             cs2.Cancel();
         }
 
+        // Wait for all tasks to complete
         Task.WaitAll(taskArray);        
         Console.WriteLine($"Batch {batchCount} end.");
         batchCount++;
