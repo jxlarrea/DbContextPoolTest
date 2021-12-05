@@ -22,8 +22,8 @@ namespace DbContextPoolTest
             try
             {
                 await _context.Animals.AsNoTracking().ToListAsync(cancellationToken);
-                await _context.Animals.CountAsync();
-                await _context.Animals.AnyAsync();
+                await _context.Animals.CountAsync(cancellationToken);
+                await _context.Animals.AnyAsync(cancellationToken);
           
             }
             catch (System.OperationCanceledException)
